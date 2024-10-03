@@ -15,4 +15,4 @@ This repository analyzes data from IPUMS USA. To obtain the data, follow these s
 ## Statement on LLM usage
 
 Aspects of the code were written with the help of ChatGPT 4o. Usage is included
-in other/llm/usage.txt
+in other/llm_usage/usage.txt

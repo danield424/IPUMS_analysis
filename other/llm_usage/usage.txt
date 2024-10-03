@@ -1,3 +1,6 @@
+LLM: ChatGPT-4o.
+Date: 3 October 2024
+
 how do i check the total number of values that are "YES" for a variable of a tibble in R
 ChatGPT said:
 ChatGPT
