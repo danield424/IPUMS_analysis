@@ -20,6 +20,7 @@ bibliography: references.bib
 #| message: false
 library(tidyverse)
 library(dplyr)
+library(kableExtra)
 ```
 
 
@@ -41,7 +42,7 @@ To obtain the data, follow these steps:
 #| warning: false
 #| message: false
 
-raw_data <- read_csv("/Users/dudaniel/Downloads/usa_00001.csv")
+raw_data <- read_csv("/Users/dudaniel/Downloads/304/IPUMS_data/usa_00001.csv")
 data <- raw_data %>% mutate(raw_data, doctoral = ifelse(EDUCD==116, "YES", "NO"))
 glimpse(data)
 doctoral_data <- filter(data,doctoral == "YES")
@@ -50,10 +51,18 @@ state_count <- doctoral_data %>% group_by(STATEICP) %>% summarise(count=n())
 
 By using the codebook, we filter the amount of respondents in each state `STATEICP` that had a doctoral degree in `EDUCD` as their highest educational attainment. Here are the results in a table:
 
-```{r}
-#| include: false
-knitr::kable(state_count, caption="Respondents In Each State with Doctoral Degree")
+```{r, echo = FALSE}
+knitr::kable(
+  state_count,
+  caption = "Respondents In Each State with Doctoral Degree",
+  col.names = c("State Code (STATEICP)", "Number of Respondents"),
+  format = "latex",
+  booktabs = TRUE,
+  linesep = ""
+) %>%
+  kable_styling(font_size = 9)
 ```
+
 # Overview of ratio estimators approach
 
 ## Background
@@ -72,7 +81,7 @@ Then we extrapolate using this ratio by applying this ratio to our column of the
 
 # Estimating Total Respondents
 
-If, for example, there are 391,171 respondents in California (state 71 according the codebook) across all levels of education, we can estimate the total number of respondents in each state as follows:
+If, for example, there are 391,171 respondents in California (state 71 according the codebook) across all levels of education, we can use the ratio estimator to estimate the total number of respondents in each state as follows:
 
 ```{r}
 #| include: false
@@ -100,14 +109,22 @@ state_count <- state_count %>%
 ```
 
 
-```{r}
-#| include: false
-state_count2 <- state_count %>% mutate(estimated_total_count = count*ratio)
-
-knitr::kable(state_count2, caption="Estimated vs Total Respondents in Each State")
+```{r, echo=FALSE}
+state_count2 <- state_count %>% mutate(estimated_total_count = round(count*ratio))
+state_count2 <- state_count2 %>% select(STATEICP, estimated_total_count, total_count)
+knitr::kable(
+  state_count2,
+  caption = "Estimated Respondents vs Total Respondents in Each State",
+  col.names = c("State Code (STATEICP)", "Actual # of Respondents", "Estimated # of Respondents"),
+  format = "latex",
+  booktabs = TRUE,
+  linesep = ""
+) %>%
+  kable_styling(font_size = 9)
 ```
 
-The estimates are likely different because of the following data limitations, discussed below:
+\newpage
+Any errors in the estimates are likely because of the following data limitations, discussed below:
 
 ### Homogeneity Assumption: 
 
